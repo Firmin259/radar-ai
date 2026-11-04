@@ -5,7 +5,7 @@ import { getFirestore } from 'firebase/firestore';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AQ.Ab8RN6JzVmcnc5xH6rgir-phbk9MwGw0aaPS8wV5uErc3cOOIg",
+  apiKey: "AIzaSyCpH0-pi59lIhsiuYGwR2h0dsgRmxovmO4",
   authDomain: "radar-ai-ab2f6.firebaseapp.com",
   projectId: "radar-ai-ab2f6",
   storageBucket: "radar-ai-ab2f6.firebasestorage.app",
