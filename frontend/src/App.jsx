@@ -1,13 +1,11 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, User, Loader2, LogOut, Plus, MessageSquare, Menu, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Send, User, Loader2, LogOut, Plus, MessageSquare, Menu, Sparkles, Image as ImageIcon, Paperclip, X } from 'lucide-react';
 import { auth, db, signOut } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, addDoc, query, where, getDocs, doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import Login from './Login';
 
 const rawUrl = import.meta.env.VITE_BACKEND_URL || 'https://radar-ai-mljr.onrender.com';
-// ✅ FIX: Clean regex without unnecessary escape characters
 const cleanUrl = rawUrl.replace(/[[\]"]/g, '').trim();
 const BACKEND_URL = cleanUrl.startsWith('http') 
   ? cleanUrl.replace(/\/+$/, '') 
@@ -19,7 +17,7 @@ export default function App() {
   const [chats, setChats] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null);
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Radar AI tactical intelligence unit online. Select a frequency or type your query below to begin session.' }
+    { role: 'assistant', content: 'Radar AI tactical intelligence unit online. How can I scan or assist your workflow today?' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,7 +59,7 @@ export default function App() {
     setSelectedMedia(null);
     setMediaType(null);
     setMessages([
-      { role: 'assistant', content: 'Radar AI tactical intelligence unit online. Select a frequency or type your query below to begin session.' }
+      { role: 'assistant', content: 'Radar AI tactical intelligence unit online. How can I scan or assist your workflow today?' }
     ]);
   };
 
@@ -92,18 +90,14 @@ export default function App() {
     reader.readAsDataURL(file);
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
   if (authChecking) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-950 text-gray-100 font-sans">
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+      <div className="flex h-screen items-center justify-center bg-[#131314] text-[#e3e3e3]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#2df8c2]" />
       </div>
     );
   }
@@ -266,29 +260,29 @@ export default function App() {
   return (
     <div className="flex h-screen bg-[#131314] text-[#e3e3e3] font-sans overflow-hidden">
       
-      {/* SIDEBAR (ChatGPT / Gemini Style) */}
-      <aside className={`${sidebarOpen ? 'w-72' : 'w-0'} transition-all duration-300 bg-[#1e1f20] border-r border-[#2df8c2]/10 flex flex-col overflow-hidden`}>
-        <div className="p-3 border-b border-[#2df8c2]/10 flex items-center justify-between">
+      {/* SIDEBAR */}
+      <aside className={`${sidebarOpen ? 'w-64' : 'w-0'} transition-all duration-300 bg-[#1e1f20] border-r border-[#2df8c2]/10 flex flex-col overflow-hidden`}>
+        <div className="p-3 border-b border-[#2df8c2]/10">
           <button 
             onClick={startNewChat}
-            className="w-full flex items-center gap-3 bg-[#282a2c] hover:bg-[#333538] text-[#e3e3e3] font-medium py-2.5 px-3 rounded-full text-xs transition-all border border-white/5 shadow-sm"
+            className="w-full flex items-center justify-center gap-2 bg-[#282a2c] hover:bg-[#333538] text-[#e3e3e3] font-medium py-2.5 px-4 rounded-full text-xs transition-all border border-white/5"
           >
             <Plus className="w-4 h-4 text-[#2df8c2]" /> 
             <span>New chat</span>
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
           <p className="px-3 text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Recent Frequencies</p>
           {chats.map(chat => (
             <button
               key={chat.id}
               onClick={() => selectChat(chat.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs text-left transition-colors truncate ${
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-left transition-colors truncate ${
                 currentChatId === chat.id ? 'bg-[#282a2c] text-[#2df8c2] font-medium border border-[#2df8c2]/20' : 'text-gray-300 hover:bg-[#1a1b1c]'
               }`}
             >
-              <MessageSquare className="w-4 h-4 shrink-0 opacity-70" />
+              <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-70" />
               <span className="truncate">{chat.title}</span>
             </button>
           ))}
@@ -296,35 +290,35 @@ export default function App() {
 
         <div className="p-3 border-t border-[#2df8c2]/10 flex items-center justify-between bg-[#171717]">
           <div className="flex items-center gap-2 truncate">
-            <div className="w-7 h-7 rounded-full bg-[#2df8c2]/20 flex items-center justify-center text-[#2df8c2] font-bold text-xs">
+            <div className="w-7 h-7 rounded-full bg-[#2df8c2]/20 flex items-center justify-center text-[#2df8c2] font-bold text-xs shrink-0">
               {user.email ? user.email[0].toUpperCase() : 'U'}
             </div>
-            <span className="text-xs text-gray-300 truncate max-w-[130px]">{user.email}</span>
+            <span className="text-xs text-gray-300 truncate max-w-[120px]">{user.email}</span>
           </div>
           <button
             onClick={() => signOut(auth)}
             title="Sign out"
-            className="p-2 hover:bg-[#282a2c] text-gray-400 hover:text-red-400 rounded-lg transition-all"
+            className="p-1.5 hover:bg-[#282a2c] text-gray-400 hover:text-red-400 rounded-lg transition-all"
           >
             <LogOut className="w-4 h-4" />
           </button>
         </div>
       </aside>
 
-      {/* MAIN CHAT CANVAS */}
+      {/* MAIN CANVAS */}
       <div className="flex-1 flex flex-col bg-[#131314] relative">
         
-        {/* TOP NAVBAR */}
-        <header className="flex items-center justify-between px-4 py-3 bg-[#131314]/80 backdrop-blur z-10">
+        {/* TOP BAR */}
+        <header className="flex items-center justify-between px-4 py-3 bg-[#131314] border-b border-[#2df8c2]/5 z-10">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 hover:bg-[#282a2c] text-gray-300 rounded-lg transition-all"
+              className="p-1.5 hover:bg-[#282a2c] text-gray-300 rounded-lg transition-all"
             >
               <Menu className="w-5 h-5" />
             </button>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-sm tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[#2df8c2] to-cyan-400">
+              <span className="font-bold text-base tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[#2df8c2] to-cyan-400">
                 Radar AI
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#2df8c2]/10 text-[#2df8c2] border border-[#2df8c2]/20">v2.5 Tactical</span>
@@ -332,41 +326,40 @@ export default function App() {
           </div>
         </header>
 
-        {/* CHAT MESSAGES STREAM CONTAINER */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 max-w-4xl w-full mx-auto">
+        {/* MESSAGES VIEWPORT */}
+        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 max-w-3xl w-full mx-auto">
           {messages.map((msg, idx) => (
-            <div key={idx} className={`flex items-start gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div key={idx} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               
               {msg.role === 'assistant' && (
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#2df8c2] to-cyan-600 flex items-center justify-center shrink-0 shadow-md text-gray-950 font-black">
-                  <Sparkles className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#2df8c2] to-cyan-600 flex items-center justify-center shrink-0 text-gray-950 font-bold">
+                  <Sparkles className="w-3.5 h-3.5" />
                 </div>
               )}
 
-              <div className={`max-w-[80%] rounded-2xl px-5 py-3.5 text-sm leading-relaxed ${
+              <div className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.role === 'user' 
-                  ? 'bg-[#282a2c] text-gray-100 rounded-tr-sm border border-white/5' 
-                  : 'bg-[#1e1f20] text-gray-200 rounded-tl-sm border border-[#2df8c2]/10 shadow-sm'
+                  ? 'bg-[#282a2c] text-gray-100 rounded-tr-none' 
+                  : 'bg-[#1e1f20] text-gray-200 rounded-tl-none border border-[#2df8c2]/10'
               }`}>
                 {msg.mediaUrl && (
                   msg.mediaType === 'video' || msg.mediaUrl.startsWith('data:video') ? (
-                    <video controls className="rounded-xl mb-3 max-w-full h-auto border border-gray-700 shadow-md max-h-64">
+                    <video controls className="rounded-xl mb-3 max-w-full h-auto border border-gray-700 max-h-60">
                       <source src={msg.mediaUrl} />
-                      Your browser does not support video preview.
                     </video>
                   ) : (
-                    <img src={msg.mediaUrl} alt="Uploaded feed" className="rounded-xl mb-3 max-w-full h-auto border border-gray-700 shadow-md max-h-64 object-cover" />
+                    <img src={msg.mediaUrl} alt="Uploaded feed" className="rounded-xl mb-3 max-w-full h-auto border border-gray-700 max-h-60 object-cover" />
                   )
                 )}
                 {msg.imageUrl && (
-                  <img src={msg.imageUrl} alt="Generated Vector Asset" className="rounded-xl mb-3 max-w-full h-auto border border-gray-700 shadow-md max-h-72 object-cover" />
+                  <img src={msg.imageUrl} alt="Generated Asset" className="rounded-xl mb-3 max-w-full h-auto border border-gray-700 max-h-72 object-cover" />
                 )}
-                <p className="whitespace-pre-wrap font-sans">{msg.content || (loading && idx === messages.length - 1 ? '...' : '')}</p>
+                <p className="whitespace-pre-wrap">{msg.content || (loading && idx === messages.length - 1 ? '...' : '')}</p>
               </div>
 
               {msg.role === 'user' && (
-                <div className="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center shrink-0 shadow-md text-white">
-                  <User className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-full bg-cyan-600 flex items-center justify-center shrink-0 text-white">
+                  <User className="w-3.5 h-3.5" />
                 </div>
               )}
 
@@ -375,7 +368,7 @@ export default function App() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* BOTTOM INPUT BAR (Gemini/ChatGPT Style) */}
+        {/* INPUT PROMPT BAR */}
         <div className="p-4 bg-[#131314] max-w-3xl w-full mx-auto">
           {selectedMedia && (
             <div className="flex items-center gap-2 bg-[#1e1f20] p-2 rounded-xl w-fit border border-[#2df8c2]/20 mb-2">
@@ -384,18 +377,18 @@ export default function App() {
               ) : (
                 <img src={selectedMedia} alt="Preview" className="w-10 h-10 object-cover rounded-lg" />
               )}
-              <span className="text-xs text-gray-300">File attached successfully</span>
+              <span className="text-xs text-gray-300">File attached</span>
               <button 
                 type="button" 
                 onClick={() => setSelectedMedia(null)}
-                className="text-gray-400 hover:text-red-400 text-xs px-2"
+                className="text-gray-400 hover:text-red-400 p-1"
               >
-                ✕
+                <X className="w-3.5 h-3.5" />
               </button>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col bg-[#1e1f20] border border-[#2df8c2]/20 rounded-3xl p-3 focus-within:border-[#2df8c2] transition-colors shadow-lg">
+          <form onSubmit={handleSubmit} className="bg-[#1e1f20] border border-[#2df8c2]/20 rounded-2xl p-2.5 focus-within:border-[#2df8c2] transition-all shadow-md">
             
             <textarea
               value={input}
@@ -406,18 +399,18 @@ export default function App() {
                   handleSubmit(e);
                 }
               }}
-              placeholder={isImageMode ? "Describe the image asset you want to synthesize..." : "Ask Radar AI or type a prompt..."}
+              placeholder={isImageMode ? "Describe the image asset to generate..." : "Ask Radar AI or type a prompt..."}
               rows={1}
-              className="w-full bg-transparent px-3 py-1 text-gray-100 placeholder-gray-500 focus:outline-none resize-none text-sm max-h-32"
+              className="w-full bg-transparent px-3 py-1 text-gray-100 placeholder-gray-500 focus:outline-none resize-none text-sm max-h-28"
             />
 
-            <div className="flex items-center justify-between pt-2 mt-2 border-t border-white/5">
+            <div className="flex items-center justify-between pt-2 border-t border-white/5">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setIsImageMode(!isImageMode)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
-                    isImageMode ? 'bg-purple-600 text-white shadow-md' : 'bg-[#282a2c] text-gray-300 hover:bg-[#333538]'
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
+                    isImageMode ? 'bg-purple-600 text-white' : 'bg-[#282a2c] text-gray-300 hover:bg-[#333538]'
                   }`}
                 >
                   <ImageIcon className="w-3.5 h-3.5" />
@@ -435,17 +428,17 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-2 bg-[#282a2c] hover:bg-[#333538] text-gray-300 rounded-full transition-all"
-                  title="Attach image or video"
+                  className="p-1.5 bg-[#282a2c] hover:bg-[#333538] text-gray-300 rounded-full transition-all"
+                  title="Attach file"
                 >
-                  📎
+                  <Paperclip className="w-3.5 h-3.5" />
                 </button>
               </div>
 
               <button
                 type="submit"
                 disabled={loading || (!input.trim() && !selectedMedia)}
-                className="p-2.5 bg-[#2df8c2] hover:bg-[#22cb9d] disabled:opacity-30 text-gray-950 font-bold rounded-full transition-all shadow-md"
+                className="p-2 bg-[#2df8c2] hover:bg-[#22cb9d] disabled:opacity-30 text-gray-950 font-bold rounded-full transition-all"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </button>
