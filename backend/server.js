@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const app = express();
 
-// Enable CORS for all routes (automatically handles preflight OPTIONS requests)
+// CORS configuration handles preflight OPTIONS automatically
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -12,9 +12,6 @@ app.use(cors({
   credentials: true,
   optionsSuccessStatus: 200
 }));
-
-// Use named wildcard pattern for explicit preflight route matching
-app.options('/(.*)', cors());
 
 // Payload parsing limits
 app.use(express.json({ limit: '50mb' }));
